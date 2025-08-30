@@ -4,7 +4,13 @@
 ;; SPDX-License-Identifier: ISC
 ;; URL: https://github.com/galdor/slime-sysdef
 ;; Version: 1.0.0
-;; Package-Requires: ("emacs" "slime")
+;; Package-Requires: (("emacs" "24.3") ("slime" "2.31"))
+
+;;; Commentary:
+
+;; We require Emacs 24.3 for cl-lib, and Slime 2.31 because Emacs does not
+;; support package dependencies without a version number so we just took the
+;; last one.
 
 ;;; Code:
 
