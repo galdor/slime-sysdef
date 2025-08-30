@@ -22,21 +22,30 @@
   (:authors "Nicolas Martyanoff <nicolas@n16f.net>")
   (:license "ISC")
   (:slime-dependencies slime-repl)
-  (:swank-dependencies swank-sysdef)
-  (:on-load))
+  (:swank-dependencies swank-sysdef))
 
 (defgroup slime-sysdef nil
   "SYSDEF support for Slime."
   :prefix "slime-sysdef-"
   :group 'slime)
 
+(defun slime-sysdef-init ()
+  (message "initializing slime-sysdef")
+  ;; We use `file-truename' to handle the case where slime-sysdef.el is a
+  ;; symlink to the original file in the cloned repository. This happens when
+  ;; slime-sysdef is installed by the Straight package manager.
+  (let* ((directory
+          (file-name-directory (file-truename (locate-library "slime-sysdef"))))
+         (swank-module-path (concat directory "swank-sysdef.lisp")))
+    (slime-eval `(cl:load ,swank-module-path))))
+
 (defun slime-sysdef-load-system (name)
   (interactive (list (slime-sysdef--read-system-name)))
-  (message "loading system %S" name)
+  (message "loading SYSDEF system %S" name)
   (slime-repl-shortcut-eval-async
-   `(swank:load-sysdef-system ,name)
+   `(sysdef:load-system (sysdef:system ,name))
    (lambda (result)
-     (message "system %S loaded" name))))
+     (message "SYSDEF system %S loaded" name))))
 
 (defslime-repl-shortcut slime-sysdef-repl--load-system ("load-system")
                         (:handler 'slime-sysdef-load-system)
@@ -44,7 +53,7 @@
 
 (defun slime-sysdef--read-system-name ()
   (let* ((prompt "system: ")
-         (names (slime-eval '(swank:list-sysdef-system-names)))
+         (names (slime-sysdef--list-system-names))
          (collection names)
          (predicate nil)
          (require-match nil)
@@ -54,6 +63,9 @@
          (completion-ignore-case t))
     (completing-read prompt collection predicate require-match initial-input
                      history default-name)))
+
+(defun slime-sysdef--list-system-names ()
+  (slime-eval '(cl:mapcar 'sysdef:system-name (sysdef:list-systems))))
 
 (provide 'slime-sysdef)
 
