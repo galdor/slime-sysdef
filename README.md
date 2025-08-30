@@ -18,6 +18,19 @@ Or with Emacs >=30:
   :vc (:url "https://github.com/galdor/slime-sysdef"))
 ```
 
+You must then add the `slime-sysdef-init` to the `slime-connected-hook`, e.g.
+in the `use-package` form of Slime:
+```lisp
+(use-package slime
+  :hook
+  ((slime-connected-hook . slime-sysdef-init)))
+```
+
+Or manually:
+```lisp
+(add-hook 'slime-connected-hook 'slime-sysdef-init)
+```
+
 ## Licensing
 The slime-sysdef package is open source software distributed under the
 [ISC](https://opensource.org/licenses/ISC) license.
