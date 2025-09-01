@@ -1,11 +1,12 @@
-(in-package :swank)
+(defpackage swank-sysdef
+  (:use :cl)
+  (:export
+   #:list-system-names))
 
-(defslimefun list-sysdef-system-names ()
+(in-package :swank-sysdef)
+
+(defun list-system-names ()
   (mapcar 'sysdef:system-name (sysdef:list-systems)))
 
-(defslimefun load-sysdef-system (name)
-  (declare (type string name))
-  (let ((system (sysdef:system name)))
-    (sysdef:load-system system)))
-
+;; Probably useless since we do not rely on slime-require in slime-sysdef.el.
 (provide :swank-sysdef)

@@ -35,7 +35,7 @@
   ;; symlink to the original file in the cloned repository. This happens when
   ;; slime-sysdef is installed by the Straight package manager.
   (let* ((directory
-          (file-name-directory (file-truename (locate-library "slime-sysdef"))))
+          (file-name-directory (file-truename (symbol-file 'slime-sysdef))))
          (swank-module-path (concat directory "swank-sysdef.lisp")))
     (slime-eval `(cl:load ,swank-module-path))))
 
@@ -58,14 +58,13 @@
 (defun slime-sysdef-load-system (name)
   (interactive (list (slime-sysdef--read-system-name)))
   (message "loading SYSDEF system %S" name)
-  (slime-repl-shortcut-eval-async
-   `(sysdef:load-system (sysdef:system ,name))
+  (slime-repl-shortcut-eval-async `(sysdef:load-system ,name)
    (lambda (result)
      (message "SYSDEF system %S loaded" name))))
 
 (defun slime-sysdef--read-system-name ()
   (let* ((prompt "system: ")
-         (names (slime-sysdef--list-system-names))
+         (names (slime-eval '(swank-sysdef:list-system-names)))
          (collection names)
          (predicate nil)
          (require-match nil)
@@ -75,9 +74,6 @@
          (completion-ignore-case t))
     (completing-read prompt collection predicate require-match initial-input
                      history default-name)))
-
-(defun slime-sysdef--list-system-names ()
-  (slime-eval '(cl:mapcar 'sysdef:system-name (sysdef:list-systems))))
 
 (provide 'slime-sysdef)
 
