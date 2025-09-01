@@ -39,6 +39,22 @@
          (swank-module-path (concat directory "swank-sysdef.lisp")))
     (slime-eval `(cl:load ,swank-module-path))))
 
+(defslime-repl-shortcut slime-sysdef-repl--initialize-registry
+                        ("initialize-registry")
+                        (:handler 'slime-sysdef-initialize-registry)
+                        (:one-liner "Initialize the SYSDEF system registry."))
+
+(defun slime-sysdef-initialize-registry ()
+  (interactive)
+  (message "initializing SYSDEF system registry")
+  (slime-repl-shortcut-eval-async `(sysdef:initialize-registry)
+   (lambda (result)
+     (message "SYSDEF system registry initialized"))))
+
+(defslime-repl-shortcut slime-sysdef-repl--load-system ("load-system")
+                        (:handler 'slime-sysdef-load-system)
+                        (:one-liner "Build and load a SYSDEF system."))
+
 (defun slime-sysdef-load-system (name)
   (interactive (list (slime-sysdef--read-system-name)))
   (message "loading SYSDEF system %S" name)
@@ -46,10 +62,6 @@
    `(sysdef:load-system (sysdef:system ,name))
    (lambda (result)
      (message "SYSDEF system %S loaded" name))))
-
-(defslime-repl-shortcut slime-sysdef-repl--load-system ("load-system")
-                        (:handler 'slime-sysdef-load-system)
-                        (:one-liner "Build and load a SYSDEF system."))
 
 (defun slime-sysdef--read-system-name ()
   (let* ((prompt "system: ")
