@@ -37,7 +37,11 @@
   (let* ((directory
           (file-name-directory (file-truename (symbol-file 'slime-sysdef))))
          (swank-module-path (concat directory "swank-sysdef.lisp")))
-    (slime-eval `(cl:load ,swank-module-path))))
+    ;; We wrap the call to LOAD with PROGN because we do not want the form to
+    ;; return a pathname (on implementations that do so, e.g. CCL). For some
+    ;; reason, SLIME cannot read printed pathnames (i.e. with a "#P" prefix)
+    ;; when interactive with SWANK.
+    (slime-eval `(cl:progn (cl:load ,swank-module-path) nil))))
 
 (defslime-repl-shortcut slime-sysdef-repl--initialize-registry
                         ("initialize-registry")
